@@ -1,19 +1,19 @@
 {
-    "name": "BigInt64 Node.js Template",
+    "name": "BigInt64 Node.js",
     "image": "node:24",
     // 컨테이너 설정
     "runArgs": [
-        "--name=bigint64_nodejs_template",
+        "--name=bigint64_nodejs_grm_cert",
         "--network=mynet",
         "-p",
-        "3502:3502"
+        "8501:8501"
     ],
     // 포트 포워딩
     "forwardPorts": [
-        3502
+        8501
     ],
     "portsAttributes": {
-        "3502": {
+        "8501": {
             "label": "Application",
             "onAutoForward": "notify"
         }
