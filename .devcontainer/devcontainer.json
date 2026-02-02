@@ -1,0 +1,47 @@
+{
+    "name": "BigInt64 Node.js Template",
+    "image": "node:24",
+    // 컨테이너 설정
+    "runArgs": [
+        "--name=bigint64_nodejs_template",
+        "--network=mynet",
+        "-p",
+        "3502:3502"
+    ],
+    // 포트 포워딩
+    "forwardPorts": [
+        3502
+    ],
+    "portsAttributes": {
+        "3502": {
+            "label": "Application",
+            "onAutoForward": "notify"
+        }
+    },
+    // 작업 디렉토리
+    "workspaceFolder": "/root/app",
+    "workspaceMount": "source=${localWorkspaceFolder},target=/root/app,type=bind",
+    // VS Code 설정
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "dbaeumer.vscode-eslint",
+                "esbenp.prettier-vscode",
+                "ms-azuretools.vscode-docker",
+                "christian-kohler.npm-intellisense",
+                "eg2.vscode-npm-script"
+            ],
+            "settings": {
+                "terminal.integrated.defaultProfile.linux": "bash",
+                "editor.formatOnSave": true,
+                "editor.defaultFormatter": "esbenp.prettier-vscode"
+            }
+        }
+    },
+    // 컨테이너 생성 후 실행할 명령
+    "postCreateCommand": "npm install",
+    // 컨테이너 시작 후 실행할 명령 (선택사항)
+    // "postStartCommand": "npm run dev",
+    // 원격 사용자
+    "remoteUser": "root"
+}

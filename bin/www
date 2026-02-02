@@ -1,0 +1,119 @@
+#!/usr/bin/env node
+const logger = require('../config/winston');
+
+require('dotenv').config({ override: true });
+
+/**
+ * Module dependencies.
+ */
+var cluster = require('cluster');
+var numCPUs = process.env.CPU_NUM || require('os').cpus().length;
+
+/**
+ * Clustering logic
+ */
+if (cluster.isMaster) {
+  logger.info(`Master ${process.pid} is running`);
+  logger.info(`Forking for ${numCPUs} CPUs`);
+
+  // Fork workers.
+  for (var i = 0; i < numCPUs; i++) {
+    cluster.fork();
+  }
+
+  cluster.on('exit', (worker, code, signal) => {
+    logger.info(`worker ${worker.process.pid} died`);
+    // Optional: Restart worker
+    cluster.fork();
+  });
+
+} else {
+
+  var app = require('../app');
+  var http = require('http');
+
+  /**
+   * Get port from environment and store in Express.
+   */
+
+  var port = normalizePort(process.env.PORT || '3000');
+  app.set('port', port);
+
+  // Workers can share any TCP connection
+  // In this case it is an HTTP server
+  var server = http.createServer(app);
+
+
+  /**
+   * Listen on provided port, on all network interfaces.
+   */
+
+  server.listen(port);
+  server.on('error', onError);
+  server.on('listening', onListening);
+}
+
+/**
+ * Normalize a port into a number, string, or false.
+ */
+
+function normalizePort(val) {
+  var port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
+
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+}
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  var bind = typeof port === 'string'
+    ? 'Pipe ' + port
+    : 'Port ' + port;
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      logger.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      logger.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+
+function onListening() {
+  logger.info('Listening on ' + port);
+  //console.log(`Worker ${process.pid} started and listening on port ${port}`);
+}
+
+/**
+ * Event listener for uncaughtException
+ */
+process.on('uncaughtException', function (err) {
+  //예상치 못한 예외 처리
+  logger.error('uncaughtException : ' + err);
+});

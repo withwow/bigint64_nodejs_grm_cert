@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package api.v1;
+
+//////////////// 공통 응답 헤더
+message ResponseHeader {
+  int64 code = 1;
+  string message = 2;
+}
+
+//////////////// 버전
+// 요청
+message VersionRequest {
+  string os = 1;
+  string appVersion = 2;
+}
+
+// 응답
+message VersionResponse {
+  ResponseHeader header = 1;
+  int32 updateFlag = 2; // 0: 없음, 1: 마이너, 2: 메이저, 3: 리뷰
+}
+
+//////////////// 로그인
+// 요청
+message LoginRequest {
+  string uid = 1;
+  string pf = 2;
+  string nickname = 3;
+  string country = 4;
+  string pt = 5;
+  string ver = 6;
+}
+
+// 응답
+// 재화 정보
+message Property {
+  int64 gold = 1;
+  int64 gem = 2;
+}
+
+message LoginResponse {
+  ResponseHeader header = 1;
+  string nickname = 2;
+  string accessToken = 3;
+  bool skipTutorial = 4;
+  Property property = 5;
+}
+
